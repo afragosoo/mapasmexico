@@ -1,0 +1,124 @@
+mapa <- st_read("areas_geoestadisticas_municipales.shp")
+
+str(mapa)
+
+ggplot(mapa)+
+  geom_sf(aes(color = "transparent"))
+
+library(dplyr)
+
+mapa_corregido <- mapa %>%
+  mutate(CVE_ENT = paste(CVE_ENT, CVE_MUN, sep = ""))
+
+str(mapa_corregido)
+
+mapa_chido <- inner_join(mapa_corregido, datos_ensanatu)
+
+ggplot(mapa_chido) +
+  geom_sf(aes(fill = Porcentaje_Pob_Diabetes_Mayor20), color = "transparent")+
+  scale_fill_gradient(low= "#56B1F7", high = "#132B43")
+
+mapa_intervalos <- mapa_chido
+
+mapa_intervalos$Intervalos_Diabetes <- cut(mapa_intervalos$Porcentaje_Pob_Diabetes_Mayor20, breaks = c(0, 7, 10, 13, 16, 19, 22, Inf),
+                                        labels = c('Menor de 7%', '7%-10%', '10%-13%', '13%-16%', '16%-19%', '19%-22%','Mayor de 22%'))
+
+
+ggplot(mapa_intervalos) +
+  geom_sf(aes(fill = Intervalos_Diabetes), color = "transparent")+
+  labs(title = "Porcentaje de la Poblacion Mayor a 20 años con Diabetes")+
+  theme(panel.background = element_rect(fill = "white"))
+
+
+mapa_intervalos$Intervalos_Covid <- cut(mapa_intervalos$tasadef_10000, breaks = c(0, 2, 4, 6, 8, 10,Inf),
+                                           labels = c('Menor de 2', '2-4', '4-6', '6-8', '8-10', 'Mayor de 10'))
+
+
+ggplot(mapa_intervalos) +
+  geom_sf(aes(fill = Intervalos_Covid), color = "transparent")+
+  labs(title = "Tasa de Defunciones por cada 10,000 habitantes a causa del Covid-19")+
+  theme(panel.background = element_rect(fill = "white"))
+
+mapa_intervalos$Intervalos_Obesidad <- cut(mapa_intervalos$Porcentaje_Pob_Obesidad_Mayor20, breaks = c(0, 10, 20, 30, 40, 50, Inf),
+                                        labels = c('Menor de 10%', '10%-20%', '20%-30%', '30%-40%', '40%-50%', 'Mayor de 50%'))
+
+ggplot(mapa_intervalos) +
+  geom_sf(aes(fill = Intervalos_Obesidad), color = "transparent")+
+  labs(title = "Porcentaje de la Poblacion Mayor a 20 años con Obesidad")+
+  theme(panel.background = element_rect(fill = "white"))
+
+
+mapa_intervalos$Intervalos_Hipertension <- cut(mapa_intervalos$Porcentaje_Pob_Hipertensin_Mayor20, breaks = c(0, 10, 15, 20, 25, 30, Inf),
+                                           labels = c('Menor de 10%', '10%-15%', '15%-20%', '20%-25%', '25%-30%', 'Mayor de 30%'))
+
+ggplot(mapa_intervalos) +
+  geom_sf(aes(fill = Intervalos_Hipertension), color = "transparent")+
+  labs(title = "Porcentaje de la Poblacion Mayor a 20 años con Hipertension")+
+  theme(panel.background = element_rect(fill = "white"), axis.line = element_blank(), axis.text = element_blank(),
+  axis.ticks = element_blank(), axis.title = element_blank()) +
+  scale_color_viridis_c(option = "magma")
+
+ggplot(mapa_intervalos) +
+  geom_sf(aes(fill = Intervalos_Obesidad), color = "transparent")+
+  labs(title = "Porcentaje de la Poblacion Mayor a 20 años con Obesidad")+
+  theme(panel.background = element_rect(fill = "white"))
+
+
+ggplot(mapa_intervalos) +
+  geom_sf(aes(fill = Intervalos_Covid), color = "transparent")+
+  labs(title = "Tasa de Defunciones por cada 10,000 habitantes a causa del Covid-19")+
+  theme(panel.background = element_rect(fill = "white"))
+
+ggplot(mapa_intervalos) +
+  geom_sf(aes(fill = Intervalos_Diabetes), color = "transparent")+
+  labs(title = "Porcentaje de la Poblacion Mayor a 20 años con Diabetes")+
+  theme(panel.background = element_rect(fill = "white"))
+
+
+
+
+
+mapa_estados <- st_read('areas_geoestadisticas_estatales.shp')
+
+
+ggplot(mapa_intervalos) +
+  geom_sf(aes(fill = Intervalos_Diabetes), color = "transparent")+
+  geom_sf(fill = 'transparent', color = 'white', data = mapa_estados)+
+  labs(title = "Porcentaje de la Poblacion Mayor a 20 años con Diabetes")+
+  theme(panel.background = element_rect(fill = "white"), axis.line = element_blank(), axis.text = element_blank(),
+        axis.ticks = element_blank(), axis.title = element_blank())+
+  scale_fill_viridis_d(name = '')
+
+ggplot(mapa_intervalos) +
+  geom_sf(aes(fill = Intervalos_Hipertension), color = "transparent")+
+  geom_sf(fill = 'transparent', color = 'white', data = mapa_estados)+
+  labs(title = "Porcentaje de la Poblacion Mayor a 20 años con Hipertension")+
+  theme(panel.background = element_rect(fill = "white"), axis.line = element_blank(), axis.text = element_blank(),
+        axis.ticks = element_blank(), axis.title = element_blank())+
+  scale_fill_viridis_d(name = '')
+
+mapa_intervalos[is.na(mapa_intervalos)]=0
+
+
+ggplot(mapa_intervalos) +
+  geom_sf(aes(fill = Intervalos_Covid), color = "transparent")+
+  geom_sf(fill = 'transparent', color = 'white', data = mapa_estados)+
+  labs(title = "Tasa de Defunciones por cada 10,000 habitantes a causa del Covid-19")+
+  theme(panel.background = element_rect(fill = "white"), axis.line = element_blank(), axis.text = element_blank(),
+        axis.ticks = element_blank(), axis.title = element_blank())
+  
+
+ggplot(mapa_intervalos) +
+  geom_sf(aes(fill = Intervalos_Obesidad), color = "transparent")+
+  geom_sf(fill = 'transparent', color = 'white', data = mapa_estados)+
+  labs(title = "Porcentaje de la Poblacion Mayor a 20 años con Obesidad")+
+  theme(panel.background = element_rect(fill = "white"), axis.line = element_blank(), axis.text = element_blank(),
+        axis.ticks = element_blank(), axis.title = element_blank())+
+  scale_fill_viridis_d(name = '')
+
+
+
+
+
+
+
